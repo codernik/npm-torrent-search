@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link id="dark" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/dark.css">
+    <link id="light" rel="preload" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+    <style>
+        body {
+            font-family: 'Roboto';
+        }
+        .card {
+            box-shadow: 0 2px 6px 0 #0000004f;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        input#search {
+            width: 100%;
+        }
+        .flex {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+        .right {
+            text-align: right;
+        }
+        .button {
+            border: 1px solid;
+            padding: 5px 10px;
+            display: inline-block;
+            margin: 5px 0;
+            border-radius: 2px;
+        }
+    </style>
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <search-engine></search-engine>
+    </div>
+    <script>
+        const app = Vue.createApp({})
+        app.component('search-engine', {
+            data() {
+                return {
+                    query: '',
+                    results: []
+                }
+            },
+            template: `<div class="flex"><form id="search-form">
+                <input type="text" name="query" id="search" placeholder="Search" v-model="query">
+                <!-- <input type="submit" value="Search"> -->
+            </form>
+            <button onclick="toggleCss()">Toggle Dark Mode</button>
+            </div>
+            <div class="card" v-for="result in results" :key="result.hash">
+                <h4><a :href="result.link">{{ result.name }}</a></h4>
+                <div class="flex"><span>Seeders: {{ result.seeders }}</span><span>{{ result.site }}</span><span>Leechers: {{ result.leechers }}</span></div>
+                <div class="flex"><span>{{ result.humanizedInfo }}</span><span>{{ result.info }}</span><span>{{ result.size }}</span></div>
+                <div class="right"><a class="button" :href="result.magnet" >Magnet</a></div>
+            </div>
+            `,
+            methods: {
+                onTypeQuery(query) {
+                    var self = this;
+                    axios.get('/search', {
+                        params: {
+                            query: this.query
+                        }
+                    })
+                    .then(function (response) {
+                        // console.log(response.data);
+                        self.results = response.data;
+                    })
+                    .catch(function (error) {
+                        // console.log(error);
+                    })
+                    .then(function () {
+                        // always executed
+                    });
+                }
+            },
+            watch: {
+                // whenever query changes, this function will run
+                query(newQuery, oldQuery) {
+                    // console.log(newQuery);
+                    // if (newQuery.indexOf('?') > -1) {
+                        this.onTypeQuery(newQuery)
+                        // }
+                    }
+                }
+            })
+            app.mount('#app')
+            
+            function toggleCss(){
+                if( document.getElementById('light').getAttribute('rel') == 'preload' ){
+                    document.getElementById('light').setAttribute('rel', 'stylesheet');
+                }else{
+                    document.getElementById('light').setAttribute('rel', 'preload');
+                }
+            }
+        </script>
+    </body>
+    </html>

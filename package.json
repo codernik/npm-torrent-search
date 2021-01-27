@@ -1,0 +1,12 @@
+{
+  "name": "torrent-search-engine",
+  "version": "1.0.0",
+  "description": "Search your favorite torrents easily.",
+  "main": "server.js",
+  "author": "Nikhil R.",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "torrz": "^1.0.0"
+  }
+}
