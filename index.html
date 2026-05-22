@@ -130,8 +130,9 @@
                     results: [],
                     loading: false,
                     error: null,
+                    sortBy: 'seeds',
                     _debounceTimer: null,
-                    _cancelToken: null  // 👈 add this
+                    _cancelToken: null
                 }
             },
             template: `
@@ -141,6 +142,10 @@
                     <input type="text" id="search" placeholder="Search torrents..." v-model="query">
                     <button class="clear-btn" @click="query = ''" v-if="query" aria-label="Clear">&#x2715;</button>
                 </div>
+                <select v-model="sortBy">
+                    <option value="seeds">Sort by Seeds</option>
+                    <option value="date">Sort by Date</option>
+                </select>
                 <button class="theme-btn" onclick="toggleCss()">
                     &#9790; Dark mode
                 </button>
@@ -150,7 +155,7 @@
             <div v-if="error" style="color:red; padding:10px;">{{ error }}</div>
             <div v-if="!loading && results.length === 0 && query" style="padding:10px; opacity:0.6;">No results found.</div>
 
-            <div class="card" v-for="(result, index) in results" :key="index">
+            <div class="card" v-for="(result, index) in sortedResults" :key="index">
                 <h4 style="margin:0 0 8px 0">
                     <a :href="result.magnet || result.desc" target="_blank">{{ result.title }}</a>
                 </h4>
@@ -170,6 +175,19 @@
                 </div>
             </div>
             `,
+            computed: {
+                sortedResults() {
+                    return [...this.results].sort((a, b) => {
+                        if (this.sortBy === 'seeds') {
+                            return (b.seeds ?? 0) - (a.seeds ?? 0);
+                        }
+                        if (this.sortBy === 'date') {
+                            return new Date(b.time) - new Date(a.time);
+                        }
+                        return 0;
+                    });
+                }
+            },
             methods: {
                 onTypeQuery() {
                     if (!this.query.trim()) {
@@ -189,13 +207,13 @@
                     
                     axios.get('/search', {
                         params: { query: this.query },
-                        cancelToken: this._cancelToken.token  // 👈 attach token
+                        cancelToken: this._cancelToken.token
                     })
                     .then(function (response) {
                         self.results = response.data;
                     })
                     .catch(function (error) {
-                        if (!axios.isCancel(error)) {  // 👈 ignore cancelled requests
+                        if (!axios.isCancel(error)) {
                             self.error = 'Search failed. Please try again.';
                             self.results = [];
                         }
