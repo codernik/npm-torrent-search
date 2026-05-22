@@ -7,6 +7,6 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
-    "torrz": "^1.0.0"
+    "torrent-search-api": "^2.1.4"
   }
 }
