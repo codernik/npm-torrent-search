@@ -1,12 +1,19 @@
 {
   "name": "torrent-search-engine",
-  "version": "1.0.0",
+  "version": "2.0.0",
+  "private": true,
   "description": "Search your favorite torrents easily.",
-  "main": "server.js",
-  "author": "Nikhil R.",
+  "author": "Nikhil",
   "license": "ISC",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
   "dependencies": {
-    "express": "^4.17.1",
+    "next": "^16.4.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "torrent-search-api": "^2.1.4"
   }
 }
